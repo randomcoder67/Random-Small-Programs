@@ -19,7 +19,7 @@ getTokens () {
 	echo "$inputClientSecret" >> "strava.txt"
 	echo "$expiryA" >> "strava.txt"
 	
-	#gpg -c "strava.txt"
+	gpg -c "strava.txt"
 }
 
 if [ ! -f strava.txt.gpg ]; then
