@@ -27,7 +27,6 @@ Python script to get current race information, at the moment only displays time 
 **ToDo:**
 * Display more information
 * Work with TTs
-* Enable auto refresh at specified interval
 
 ### Setup
 
@@ -35,4 +34,4 @@ Dependancies: `python requests` and `python BeautifulSoup4`
 
 ### Usage
 
-`python3 getInfo.py` will display currently active races, enter the number corresponding to the race you want and it will display current time gaps. **Note:** does not currently work for time trials as they are formatted differently. 
+`python3 getInfo.py *refresh_Duration* (optional, default 10(s))` will display currently active races, enter the number corresponding to the race you want and it will display current time gaps and general race stats. **Note:** does not currently work for time trials as they are formatted differently. 

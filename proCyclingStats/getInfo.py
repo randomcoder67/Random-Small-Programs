@@ -4,11 +4,9 @@ import requests
 from bs4 import BeautifulSoup
 from countryDict import countries
 import curses
+from curses import wrapper
 import sys
 import time
-from curses import wrapper
-
-
 
 if len(sys.argv) == 1:
 	refreshInterval = 10
@@ -87,32 +85,20 @@ def main(cursesScreen):
 			if i == 4:
 				break
 
-		#cursesScreen.addstr(1, 1, colours["yellow"] + "Completed:\t " + colours["end"] + colours["red"] + stageStats[2] + "KM" + colours["end"])
-		#cursesScreen.addstr(2, 1, colours["yellow"] + "Remaining:\t " + colours["end"] + colours["cyan"] + stageStats[0] + "KM" + colours["end"])
 		cursesScreen.addstr(1, 1, "Completed:\t ", YELLOW)
 		cursesScreen.addstr(stageStats[2] + "KM", RED)
-		
 		cursesScreen.addstr(2, 1, "Remaining:\t ", YELLOW)
 		cursesScreen.addstr(stageStats[0] + "KM", CYAN)
-		
 		cursesScreen.addstr(3, 1, "Time:\t\t ", YELLOW)
 		cursesScreen.addstr(stageStats[1], MAGENTA)
-		
 		cursesScreen.addstr(4, 1, "Average Speed:\t ", YELLOW)
 		cursesScreen.addstr(stageStats[3] + "KM/H", GREEN)
-		
 		cursesScreen.addstr(5, 1, "Start Time:\t ", YELLOW)
 		cursesScreen.addstr(stageStats[4], BLUE)
-		#print(colours["yellow"] + "Time:\t\t " + colours["end"] + colours["magenta"] + stageStats[1] + colours["end"])
-		#print(colours["yellow"] + "Average Speed:\t " + colours["end"] + colours["green"] + stageStats[3] + "KM/H" + colours["end"])
-		#print(colours["yellow"] + "Start Time:\t " + colours["end"] + colours["blue"] + stageStats[4] + colours["end"])
 
 		situation = soup.find("ul", class_="situ3")
-
 		riderCont = situation.find_all("div", class_="riderCont")
-
 		lengthA = len(riderCont)
-		
 		globalIndex = 7
 
 		for i, x in enumerate(riderCont):
@@ -149,14 +135,16 @@ def main(cursesScreen):
 				cursesScreen.addstr(globalIndex, 1, rider[0].text, RED)
 				cursesScreen.addstr(". ")
 				cursesScreen.addstr(rider[3].text, GREEN)
-				cursesScreen.addstr(" (")
+				cursesScreen.addstr(globalIndex, 30, " (")
 				cursesScreen.addstr(rider[2].text, BLUE)
-				cursesScreen.addstr(") (")
+				cursesScreen.addstr(") ")
+				cursesScreen.addstr(globalIndex, 38, "(")
 				cursesScreen.addstr(rider[1].span['title'], CYAN)
-				cursesScreen.addstr(") (")
+				cursesScreen.addstr(") ")
+				cursesScreen.addstr(globalIndex, 80, "(")
 				cursesScreen.addstr(countries.get(rider[5].span['class'][2].upper(), 'ERROR'), MAGENTA)
 				cursesScreen.addstr(")")
-				#print(f"{colours['red']}{rider[0].text}{colours['end']}: {colours['green']}{rider[3].text}{colours['end']} ({colours['blue']}{rider[2].text}{colours['end']}) ({colours['cyan']}{rider[1].span['title']}{colours['end']}) ({colours['magenta']}{countries.get(rider[5].span['class'][2].upper(), 'ERROR')}{colours['end']})")
+				
 				globalIndex += 1
 			globalIndex += 1
 		ch = cursesScreen.getch()
@@ -165,13 +153,3 @@ def main(cursesScreen):
 		time.sleep(refreshInterval)
 
 wrapper(main)
-'''
-for sib in target.find_next_siblings():
-	if sib.name == "h3":
-		break
-	else:
-		print(sib)
-		print("END\n\n\n\n\n\n")
-		#links = sib.find_all("a", href=True)
-		#print(links.)
-'''
