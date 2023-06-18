@@ -7,7 +7,6 @@ A repository for random small scripts and programs I write.
 Script to get info from Strava API. Currently supports viewing one of your activities by ID, and a segment by ID.  
 Uses a bash script for the main functionality and calls a Python script to get the segment leaderboard because it's not included in the Strava API free functionality.  
 **ToDo:** 
-* Add setup process to the script
 * Add ability to upload a ride
 * Easier way to select activities and segments than using the ID
 
@@ -15,17 +14,7 @@ Uses a bash script for the main functionality and calls a Python script to get t
 
 Dependancies: `glow`, `jq`, `python requests` and `python BeautifulSoup4`  
 
-Create a file called stravaread.txt with the following contents:
-
-```
-Refresh Token
-Access Token
-Client ID
-Client Secret
-Expiry Time of Access Token
-```
-
-then encrypt it with a passwork using GPG `gpg -c stravaread.txt` and delete non encrypted file `rm stravaread.txt`
+Run `./strava.sh` and follow instructions 
 
 ### Usage 
 
