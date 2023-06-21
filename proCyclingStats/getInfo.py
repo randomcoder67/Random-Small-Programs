@@ -50,8 +50,10 @@ for i, link in enumerate(links):
 #url = "https://www.procyclingstats.com/" + options[int(choice)-1]
 
 def main(cursesScreen):
+	counter = 1
 	while True:
 		curses.curs_set(0)
+		cursesScreen.nodelay(True)
 		response = requests.get(url)
 		
 		curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
@@ -101,9 +103,7 @@ def main(cursesScreen):
 		lengthA = len(riderCont)
 		globalIndex = 7
 
-		for i, x in enumerate(riderCont):
-			#print("")
-			
+		for i, x in enumerate(riderCont):			
 			timeGap = ""
 			if not i == 0:
 				timeGap = f"@{x.find('span', class_='time').text}"
@@ -144,12 +144,18 @@ def main(cursesScreen):
 				cursesScreen.addstr(globalIndex, 80, "(")
 				cursesScreen.addstr(countries.get(rider[5].span['class'][2].upper(), 'ERROR'), MAGENTA)
 				cursesScreen.addstr(")")
+				cursesScreen.addstr(str(counter))
 				
 				globalIndex += 1
 			globalIndex += 1
-		ch = cursesScreen.getch()
+		try:
+			ch = cursesScreen.getch()
+		except:
+			ch = "NONE"
+			print("a")
 		if ch == ord("q"):
 			break
+		counter += 1
 		time.sleep(refreshInterval)
 
 wrapper(main)
