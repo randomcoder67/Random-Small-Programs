@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
+# Function to get tokens if you don't already have them
 getTokens () {
 	echo "Visit https://www.strava.com/settings/api and create an application, then copy and paste the Client ID and Client Secret into the following prompts:"
 	read -p "Client ID: " inputClientID
 	read -p "Client Secret: " inputClientSecret
+	# Uses this URL to request access to your account 
 	echo "Visit this URL: https://www.strava.com/oauth/authorize?client_id=$inputClientID&response_type=code&redirect_uri=http%3A%2F%2Flocalhost&scope=activity:raed_all,write&state=mystate&approval_prompt=force, grant access and then copy the code from the URL"
 	read -p "Code: " inputCode
+	# Exchanges the code you recieved for a refresh and access token 
 	exchangeRequest=$(curl -s -X POST https://www.strava.com/oauth/token -F client_id="$inputClientID" -F client_secret="$inputClientSecret" -F code="$inputCode" -F grant_type=authorization_code)
 	
 	echo $exchangeRequest
@@ -13,6 +16,7 @@ getTokens () {
 	refreshTokenA=$(echo "$exchangeRequest" | jq -r .refresh_token)
 	expiryA=$(echo "$exchangeRequest" | jq .expires_at)
 	
+	# Saves everything to a file and encrypts
 	echo "$refreshTokenA" > "strava.txt"
 	echo "$accessTokenA" >> "strava.txt"
 	echo "$inputClientID" >> "strava.txt"
@@ -26,6 +30,7 @@ if [ ! -f strava.txt.gpg ]; then
 	getTokens
 fi
 
+# Gets the tokens from the encrypted file, and if neccessary requests a new access token
 init () {
 	encryptedOutput=$(gpg -q -d "strava.txt.gpg")
 	refreshA=$(echo "$encryptedOutput" | sed -n "1p")
