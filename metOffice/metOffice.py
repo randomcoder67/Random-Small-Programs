@@ -167,7 +167,7 @@ def main(cursesScreen):
 				item = allDays[currentDay][2][itemIndex-9+currentPosition]
 				if itemIndex == currentPosition:
 					break
-				value = int(item.replace("%", "").replace("<", ""))
+				value = int(item.replace("%", "").replace("<", "").replace("≥", ""))
 				if value < 15:
 					precColor = CYAN
 				elif value < 30:

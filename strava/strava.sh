@@ -115,10 +115,36 @@ makeGlowSegment () {
 	echo "| QOM | $(date -d@$(awk -v mins="$(echo $segmentQOM | cut -d ":" -f 1)" -v secs="$(echo $segmentQOM | cut -d ":" -f 2)" 'BEGIN{sum=mins*60+secs; printf "%d\n", sum}') -u +"%H:"%M:"%S") |" >> glow.md
 }
 
-
+# Add new activity 
 if [[ "$1" == "-a" ]]; then
 	init
-	echo -a
+	# Read in activity details from user
+	read -p "Name of Activity: " nameA
+	read -p "Description of Activity: " descriptionA
+	read -p "Trainer? (y/N): " trainerYN
+	read -p "Commute? (y/N): " commuteYN
+	
+	# Assign trainer value to true of false depending on user input
+	if [[ "$trainerYN" == "y" ]]; then
+		trainerA="true"
+	elif [[ "$trainerYN" == "n" ]] || [[ "$trainerYN" == "" ]]; then
+		trainerA="false"
+	fi
+	
+	# Assign commute value to true of false depending on user input
+	if [[ "$commuteYN" == "y" ]]; then
+		commuteA="true"
+	elif [[ "$commuteYN" == "n" ]] || [[ "$commuteYN" == "" ]]; then
+		commuteA="false"
+	fi
+	
+	# Get file type
+	fileNameA=$(basename "$2")
+	dataTypeA="${fileNameA##*.}"
+	
+	# Send curl request and capture returned json
+	returnedJSON=$(curl -X POST "https://www.strava.com/api/v3/uploads" -d file="$2" -d name="$nameA" -d description="$descriptionA" -d trainer="$trainerA" -d commute="$commuteA" -d data_type="$dataTypeA" -H "Authorization: Bearer $accessA")
+# View information for segment
 elif [[ "$1" == "-s" ]]; then
 	init
 	returnedJSON=$(curl -s -G "https://www.strava.com/api/v3/segments/{$2}" -H "Authorization: Bearer $accessA")
@@ -131,6 +157,7 @@ elif [[ "$1" == "-s" ]]; then
 	python3 segmentLeaderboard.py "$2"
 
 	paste <(unbuffer glow -w 50 glow.md) <(unbuffer glow -w 62 table.md) | column -s $'\t' -tne$
+# View information for ride
 elif [[ "$1" == "-r" ]]; then
 	init read
 	returnedJSON=$(curl -s -G "https://www.strava.com/api/v3/activities/{$2}?include_all_efforts=" -H "Authorization: Bearer $accessA")
@@ -142,6 +169,7 @@ elif [[ "$1" == "-r" ]]; then
 	makeGlowActivity
 
 	glow glow.md
+# Print help info
 else
 	echo "Usage:"
 	echo "  -a FILENAME = Add Ride"
