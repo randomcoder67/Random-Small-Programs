@@ -48,7 +48,13 @@ Python script to get weather forecast from the MetOffice. (Uses web scraping, th
 
 Dependancies: `python BeautifulSoup4` `python requests` `python curses`
 
-Change the URL in line 12 to the URL for your town/city (Default is London)
+Create file `locations.csv` in the same directory as metOffice.py of the format:
+```
+Location Name|Location ID
+Location Name|Location ID
+```
+
+`Location ID` is the string after forecast in the url
 
 ### Usage 
 
