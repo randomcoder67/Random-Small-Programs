@@ -44,22 +44,22 @@ weatherColors = {
 }
 
 windDirection = {
-	"N": "",
-	"E": "",
-	"S": "",
-	"W": "",
-	"NE": " ",
-	"SE": " ",
-	"NW": " ",
-	"SW": " ",
-	"NNE": "",
-	"ENE": "",
-	"ESE": "",
-	"SSE": "",
-	"NNW": "",
-	"WNW": "",
-	"WSW": "",
-	"SSW": ""
+	"S": "",
+	"W": "",
+	"N": "",
+	"E": "",
+	"SW": " ",
+	"NW": " ",
+	"SE": " ",
+	"NE": " ",
+	"SSW": "",
+	"WNW": "",
+	"WSW": "",
+	"NNW": "",
+	"SSE": "",
+	"ESE": "",
+	"ENE": "",
+	"NNE": ""
 }
 	
 rowLabels = ["Time", "Weather Symbol", "Change of Precipitation", "Temperature (°C)", "Feels like temperature (°C)", "Wind direction and speed", "Wind gust", "Visibility", "Humidity", "UV"]

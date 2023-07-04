@@ -250,7 +250,7 @@ def main(cursesScreen):
 					windColor = YELLOW
 				else:
 					windColor = RED
-				cursesScreen.addstr(index*2+2, 30+itemIndex*8, item, windColor)
+				cursesScreen.addstr(index*2+1, 30+itemIndex*8, item, windColor)
 			index += 1
 			
 			# Wind gust 
