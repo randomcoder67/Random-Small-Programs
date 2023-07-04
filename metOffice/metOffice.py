@@ -6,9 +6,14 @@ import pandas as pd
 from metOfficeDict import weatherSymbols, windDirection, rowLabels, weatherColors
 import curses
 from curses import wrapper
+import os
 
 # Display avalible locations and allow user to pick (unless there is only one)
-f = open("locations.csv", "r")
+
+fileLocation = os.path.realpath(__file__)
+locationsFileName = fileLocation.rpartition("/")[0] + "/locations.csv"
+
+f = open(locationsFileName, "r")
 lines = f.readlines()
 location = ""
 if len(lines) == 1:
