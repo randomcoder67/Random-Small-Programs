@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 
+dirName="$HOME/Programs/smallPrograms/strava"
+
 # Function to get tokens if you don't already have them
 getTokens () {
 	echo "Visit https://www.strava.com/settings/api and create an application, then copy and paste the Client ID and Client Secret into the following prompts:"
 	read -p "Client ID: " inputClientID
 	read -p "Client Secret: " inputClientSecret
 	# Uses this URL to request access to your account 
-	echo "Visit this URL: https://www.strava.com/oauth/authorize?client_id=$inputClientID&response_type=code&redirect_uri=http%3A%2F%2Flocalhost&scope=activity:raed_all,write&state=mystate&approval_prompt=force, grant access and then copy the code from the URL"
+	echo "Visit this URL: https://www.strava.com/oauth/authorize?client_id=$inputClientID&response_type=code&redirect_uri=http%3A%2F%2Flocalhost&scope=activity:read_all,activity:write&state=mystate&approval_prompt=force, grant access and then copy the code from the URL"
 	read -p "Code: " inputCode
 	# Exchanges the code you recieved for a refresh and access token 
 	exchangeRequest=$(curl -s -X POST https://www.strava.com/oauth/token -F client_id="$inputClientID" -F client_secret="$inputClientSecret" -F code="$inputCode" -F grant_type=authorization_code)
@@ -17,22 +19,22 @@ getTokens () {
 	expiryA=$(echo "$exchangeRequest" | jq .expires_at)
 	
 	# Saves everything to a file and encrypts
-	echo "$refreshTokenA" > "strava.txt"
-	echo "$accessTokenA" >> "strava.txt"
-	echo "$inputClientID" >> "strava.txt"
-	echo "$inputClientSecret" >> "strava.txt"
-	echo "$expiryA" >> "strava.txt"
+	echo "$refreshTokenA" > "$dirName/strava.txt"
+	echo "$accessTokenA" >> "$dirName/strava.txt"
+	echo "$inputClientID" >> "$dirName/strava.txt"
+	echo "$inputClientSecret" >> "$dirName/strava.txt"
+	echo "$expiryA" >> "$dirName/strava.txt"
 	
-	gpg -c "strava.txt"
+	gpg -c "$dirName/strava.txt"
 }
 
-if [ ! -f strava.txt.gpg ]; then
+if [ ! -f "$dirName/strava.txt.gpg" ]; then
 	getTokens
 fi
 
 # Gets the tokens from the encrypted file, and if neccessary requests a new access token
 init () {
-	encryptedOutput=$(gpg -q -d "strava.txt.gpg")
+	encryptedOutput=$(gpg -q -d "$dirName/strava.txt.gpg")
 	refreshA=$(echo "$encryptedOutput" | sed -n "1p")
 	accessA=$(echo "$encryptedOutput" | sed -n "2p")
 	clientA=$(echo "$encryptedOutput" | sed -n "3p")
@@ -54,14 +56,14 @@ init () {
 	rm "strava.txt.gpg"
 	#rm "strava$1.txt"
 
-	echo "$refreshA" > "strava.txt"
-	echo "$accessA" >> "strava.txt"
-	echo "$clientA" >> "strava.txt"
-	echo "$clientSecretA" >> "strava.txt"
-	echo "$expireTimeEpoch" >> "strava.txt"
+	echo "$refreshA" > "$dirName/strava.txt"
+	echo "$accessA" >> "$dirName/strava.txt"
+	echo "$clientA" >> "$dirName/strava.txt"
+	echo "$clientSecretA" >> "$dirName/strava.txt"
+	echo "$expireTimeEpoch" >> "$dirName/strava.txt"
 
-	gpg -q -c "strava.txt"
-	rm "strava.txt"
+	gpg -q -c "$dirName/strava.txt"
+	rm "$dirName/strava.txt"
 }
 
 makeGlowActivity () {
@@ -87,6 +89,7 @@ makeGlowActivity () {
 	echo "| Highest Elevation | $activityElevHigh" m" |" >> glow.md
 	echo "| Lowest Elevation | $activityElevLow" m" |" >> glow.md
 	echo "| PRs | $activityPRCount" PRs" |" >> glow.md
+	echo "| Lap One Time | $(date -d@$lapOneTime -u +"%H:"%M:"%S") |" >> glow.md
 }
 
 
@@ -141,9 +144,17 @@ if [[ "$1" == "-a" ]]; then
 	# Get file type
 	fileNameA=$(basename "$2")
 	dataTypeA="${fileNameA##*.}"
+	echo $dataTypeA
+	echo $fileNameA
+	#exit
 	
 	# Send curl request and capture returned json
-	returnedJSON=$(curl -X POST "https://www.strava.com/api/v3/uploads" -d file="$2" -d name="$nameA" -d description="$descriptionA" -d trainer="$trainerA" -d commute="$commuteA" -d data_type="$dataTypeA" -H "Authorization: Bearer $accessA")
+	returnedJSON=$(curl -X POST "https://www.strava.com/api/v3/uploads" -F file="@""$2" -F name="$nameA" -F description="$descriptionA" -F trainer="$trainerA" -F commute="$commuteA" -F data_type="$dataTypeA" -H "Authorization: Bearer $accessA")
+	uploadID=$(echo "$returnedJSON" | jq .id)
+	sleep 3
+	finishedUpload=$(curl "https://www.strava.com/api/v3/uploads/$uploadID" -h "Authorization: Bearer $accessA")
+	rideID=$(echo "$finishedUpload" | jq .activity_id)
+	"$HOME/Programs/smallPrograms/strava.sh" -r "$rideID"
 # View information for segment
 elif [[ "$1" == "-s" ]]; then
 	init
@@ -164,11 +175,12 @@ elif [[ "$1" == "-r" ]]; then
 
 	oldIFS=$IFS
 	IFS='|'
-	read -r activityName activityDistance activityMovingTime activityElapsedTime activityElevationGain activityStartTime activityCity activityState activityCountry activityAchievements activityKudos activitiesAthleteCount activityAverageSpeed activityMaxSpeed activityElevHigh activityElevLow activityPRCount <<<$(echo $returnedJSON | jq -r '[.name,.distance,.moving_time,.elapsed_time,.total_elevation_gain,.start_date_local,.location_city,.location_state,.location_country,.achievement_count,.kudos_count,.athlete_count,.average_speed,.max_speed,.elev_high,.elev_low,.pr_count] | join("|")')
+	read -r activityName activityDistance activityMovingTime activityElapsedTime activityElevationGain activityStartTime activityCity activityState activityCountry activityAchievements activityKudos activitiesAthleteCount activityAverageSpeed activityMaxSpeed activityElevHigh activityElevLow activityPRCount lapOneTime <<<$(echo $returnedJSON | jq -r '[.name,.distance,.moving_time,.elapsed_time,.total_elevation_gain,.start_date_local,.location_city,.location_state,.location_country,.achievement_count,.kudos_count,.athlete_count,.average_speed,.max_speed,.elev_high,.elev_low,.pr_count,.laps[0].elapsed_time] | join("|")')
 	IFS=$oldIFS
 	makeGlowActivity
 
 	glow glow.md
+	
 # Print help info
 else
 	echo "Usage:"
