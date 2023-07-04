@@ -1,2 +1,5 @@
 metOffice/__pycache__/
 proCyclingStats/__pycache__/
+metOffice/output.html
+proCyclingStats/output.html
+metOffice/locations.csv

@@ -4,14 +4,36 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 from metOfficeDict import weatherSymbols, windDirection, rowLabels, weatherColors
-
 import curses
 from curses import wrapper
 
+# Display avalible locations and allow user to pick (unless there is only one)
+f = open("locations.csv", "r")
+lines = f.readlines()
+location = ""
+if len(lines) == 1:
+	location = lines[0].split("|")[1]
+else:
+	for i, x in enumerate(lines):
+		print(str(i+1) + ": " + x.split("|")[0])
+	selectedLocation = input("Which location? ")
+	if int(selectedLocation) > (i+1):
+		exit()
+	location = lines[int(selectedLocation)-1].split("|")[1]
 
-r = requests.get('https://www.metoffice.gov.uk/weather/forecast/gcpvj0v07')
+location = location.rstrip()
+
+r = requests.get('https://www.metoffice.gov.uk/weather/forecast/' + location)
 
 soup = BeautifulSoup(r.text, 'html.parser')
+
+days = soup.find_all("span", {"class": "timeline-date"})
+
+dateStrings = []
+
+for day in days:
+	dateStrings.append(day.parent.text)
+
 things = soup.find_all('img')
 
 for x in things:
@@ -119,6 +141,8 @@ def main(cursesScreen):
 			WHITE = curses.color_pair(7)
 			#DARK_BLUE = curses.color_pair(8)
 			
+			cursesScreen.addstr(0, 1, dateStrings[currentDay] + ":\t ", MAGENTA)
+			
 			lengthA = len(allDays[currentDay][0])
 			
 			if currentPosition > lengthA:
@@ -127,15 +151,15 @@ def main(cursesScreen):
 				rangeA = 9
 			
 			for row, text in enumerate(rowLabels):
-				cursesScreen.addstr(row*2+1, 1, text + ":\t ", YELLOW)
+				cursesScreen.addstr(row*2+2, 1, text + ":\t ", YELLOW)
 			
-			index = 0
+			index = 1
 			# Time
 			for itemIndex in range(0, rangeA):
 				item = allDays[currentDay][0][itemIndex-9+currentPosition]
 				if itemIndex == currentPosition:
 					break
-				cursesScreen.addstr(index*2+1, 30+itemIndex*8, item, CYAN)
+				cursesScreen.addstr(index*2, 30+itemIndex*8, item, CYAN)
 			index += 1
 			
 			# Condition
@@ -159,7 +183,7 @@ def main(cursesScreen):
 					condColor = CYAN
 				elif item in weatherColors["colorBlue"]:
 					condColor = BLUE
-				cursesScreen.addstr(index*2+1, 30+itemIndex*8, weatherSymbols[item], condColor)
+				cursesScreen.addstr(index*2, 30+itemIndex*8, weatherSymbols[item], condColor)
 			index += 1
 			
 			# Precipitaton 
@@ -176,7 +200,7 @@ def main(cursesScreen):
 					precColor = YELLOW
 				else:
 					precColor = RED
-				cursesScreen.addstr(index*2+1, 30+itemIndex*8, item, precColor)
+				cursesScreen.addstr(index*2, 30+itemIndex*8, item, precColor)
 			index += 1
 			
 			# Temperature and Feels like temperature
@@ -196,7 +220,7 @@ def main(cursesScreen):
 						tempColor = YELLOW
 					else:
 						tempColor = RED
-					cursesScreen.addstr(index*2+1, 30+itemIndex*8, item, tempColor) 
+					cursesScreen.addstr(index*2, 30+itemIndex*8, item, tempColor) 
 					
 				index += 1
 			
@@ -205,7 +229,7 @@ def main(cursesScreen):
 				item = allDays[currentDay][5][itemIndex-9+currentPosition]
 				if itemIndex == currentPosition:
 					break 
-				cursesScreen.addstr(index*2+1, 30+itemIndex*8, item, WHITE)
+				cursesScreen.addstr(index*2, 30+itemIndex*8, item, WHITE)
 			for itemIndex in range(0, rangeA):
 				item = allDays[currentDay][6][itemIndex-9+currentPosition]
 				if itemIndex == currentPosition:
@@ -240,7 +264,7 @@ def main(cursesScreen):
 					windColor = YELLOW
 				else:
 					windColor = RED
-				cursesScreen.addstr(index*2+1, 30+itemIndex*8, item, windColor)
+				cursesScreen.addstr(index*2, 30+itemIndex*8, item, windColor)
 			index += 1
 			
 			# Visibility
@@ -262,7 +286,7 @@ def main(cursesScreen):
 					visColor = CYAN
 				elif item == "E":
 					visColor = CYAN
-				cursesScreen.addstr(index*2+1, 30+itemIndex*8, item, visColor)
+				cursesScreen.addstr(index*2, 30+itemIndex*8, item, visColor)
 			index += 1
 			
 			# Humidity
@@ -270,7 +294,7 @@ def main(cursesScreen):
 				item = allDays[currentDay][9][itemIndex-9+currentPosition]
 				if itemIndex == currentPosition:
 					break
-				cursesScreen.addstr(index*2+1, 30+itemIndex*8, item, BLUE)
+				cursesScreen.addstr(index*2, 30+itemIndex*8, item, BLUE)
 			index += 1
 			
 			# UV
@@ -291,7 +315,7 @@ def main(cursesScreen):
 				elif item == "11":
 					uvColor = MAGENTA
 				#print(uvColor)
-				cursesScreen.addstr(index*2+1, 30+itemIndex*8, item, uvColor)
+				cursesScreen.addstr(index*2, 30+itemIndex*8, item, uvColor)
 			index += 1
 		
 		ch = cursesScreen.getch()

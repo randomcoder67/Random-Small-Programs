@@ -8,6 +8,8 @@ from curses import wrapper
 import sys
 import time
 
+stuff = ""
+
 if len(sys.argv) == 1:
 	refreshInterval = 10
 else:
@@ -46,10 +48,12 @@ for i, link in enumerate(links):
 	print(f"{i+1}: {title}")
 	options.append(hyperlink)
 
-#choice = input("Enter choice: ")
-#url = "https://www.procyclingstats.com/" + options[int(choice)-1]
+choice = input("Enter choice: ")
+url = "https://www.procyclingstats.com/" + options[int(choice)-1]
+print(url)
 
 def main(cursesScreen):
+	global stuff
 	counter = 1
 	while True:
 		curses.curs_set(0)
@@ -68,11 +72,11 @@ def main(cursesScreen):
 		BLUE = curses.color_pair(4)
 		MAGENTA = curses.color_pair(5)
 		CYAN = curses.color_pair(6)
-		#soup = BeautifulSoup(response.text, "html.parser")
+		soup = BeautifulSoup(response.text, "html.parser")
 
-		f = open("output.html", "r")
-		soup = BeautifulSoup(f.read(), "html.parser")
-		f.close()
+		#f = open("output.html", "r")
+		#soup = BeautifulSoup(f.read(), "html.parser")
+		#f.close()
 
 		uLists = soup.find_all("ul")
 
@@ -83,6 +87,7 @@ def main(cursesScreen):
 		stageStats = []
 
 		for i, element in enumerate(listElements):
+			stuff = listElements
 			stageStats.append(element.find_all("div")[1].text)
 			if i == 4:
 				break
@@ -158,4 +163,8 @@ def main(cursesScreen):
 		counter += 1
 		time.sleep(refreshInterval)
 
-wrapper(main)
+try:
+	wrapper(main)
+except:
+	print("here")
+	print(stuff)
