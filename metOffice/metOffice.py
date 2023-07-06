@@ -22,6 +22,8 @@ else:
 	for i, x in enumerate(lines):
 		print(str(i+1) + ": " + x.split("|")[0])
 	selectedLocation = input("Which location? ")
+	if selectedLocation == "q" or selectedLocation == "exit":
+		exit()
 	if int(selectedLocation) > (i+1):
 		exit()
 	location = lines[int(selectedLocation)-1].split("|")[1]

@@ -3,6 +3,9 @@
 from bs4 import BeautifulSoup
 import requests
 import sys
+from os.path import expanduser
+
+home = expanduser("~")
 
 urlA = "https://www.strava.com/segments/" + sys.argv[1] + "?filter=overall"
 
@@ -25,7 +28,9 @@ for row in rows:
 	cols = [ele.text.strip() for ele in cols]
 	data.append([ele for ele in cols if ele])
 
-markdownFile = open("table.md", "w")
+fileName = home + "/Programs/output/.temp/table.md"
+
+markdownFile = open(fileName, "w")
 markdownFile.write("# Segment Leaderboard\n")
 markdownFile.write("| Rank | Name | Speed | Power | Time |\n")
 markdownFile.write("| :--: | :--: | :--: | :--: | :--: |\n")

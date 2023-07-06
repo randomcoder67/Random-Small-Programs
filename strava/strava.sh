@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 dirName="$HOME/Programs/smallPrograms/strava"
+dirTemp="$HOME/Programs/output/.temp"
 
 # Function to get tokens if you don't already have them
 getTokens () {
@@ -53,7 +54,7 @@ init () {
 	accessA=$(echo "$newAccessRequest" | sed -n "1p")
 	expireTimeEpoch=$(echo "$newAccessRequest" | sed -n "2p")
 
-	rm "strava.txt.gpg"
+	rm "$dirName/strava.txt.gpg"
 	#rm "strava$1.txt"
 
 	echo "$refreshA" > "$dirName/strava.txt"
@@ -67,55 +68,55 @@ init () {
 }
 
 makeGlowActivity () {
-	echo "# Testing Activies" > glow.md
+	echo "# Testing Activies" > "$dirTemp/glow.md"
 
-	echo "| Key | Value |" >> glow.md
-	echo "| :--: | :--: |" >> glow.md
+	echo "| Key | Value |" >> "$dirTemp/glow.md"
+	echo "| :--: | :--: |" >> "$dirTemp/glow.md"
 
-	echo "| Name | $activityName |" >> glow.md
-	echo "| Distance | $(awk -v var="$activityDistance" 'BEGIN{sum=var/1000; printf "%.2f km\n", sum}') |" >> glow.md
-	echo "| Moving Time | $(date -d@$activityMovingTime -u +"%H:"%M:"%S") |" >> glow.md
-	echo "| Elapsed Time | $(date -d@$activityElapsedTime -u +"%H:"%M:"%S") |" >> glow.md
-	echo "| Elevation Gain | $activityElevationGain" m" |" >> glow.md
-	echo "| Start Time | $(echo $activityStartTime | tr 'T' ' ' | tr 'Z' ' ' | awk '{$1=$1};1') |" >> glow.md
-	echo "| City | $activityCity |" >> glow.md
-	echo "| State | $activityState |" >> glow.md
-	echo "| Country | $activityCountry |" >> glow.md
-	echo "| Achievements | $activityAchievements" Achievements" |" >> glow.md
-	echo "| Kudos | $activityKudos" Kudos" |" >> glow.md
-	echo "| Athletes | $activitiesAthleteCount" Athletes" |" >> glow.md
-	echo "| Average Speed | $(awk -v var="$activityAverageSpeed" 'BEGIN{sum=var*3.6; printf "%.2f km/h\n", sum}') |" >> glow.md
-	echo "| Max Speed | $(awk -v var="$activityMaxSpeed" 'BEGIN{sum=var*3.6; printf "%.2f km/h\n", sum}') |" >> glow.md
-	echo "| Highest Elevation | $activityElevHigh" m" |" >> glow.md
-	echo "| Lowest Elevation | $activityElevLow" m" |" >> glow.md
-	echo "| PRs | $activityPRCount" PRs" |" >> glow.md
-	echo "| Lap One Time | $(date -d@$lapOneTime -u +"%H:"%M:"%S") |" >> glow.md
+	echo "| Name | $activityName |" >> "$dirTemp/glow.md"
+	echo "| Distance | $(awk -v var="$activityDistance" 'BEGIN{sum=var/1000; printf "%.2f km\n", sum}') |" >> "$dirTemp/glow.md"
+	echo "| Moving Time | $(date -d@$activityMovingTime -u +"%H:"%M:"%S") |" >> "$dirTemp/glow.md"
+	echo "| Elapsed Time | $(date -d@$activityElapsedTime -u +"%H:"%M:"%S") |" >> "$dirTemp/glow.md"
+	echo "| Elevation Gain | $activityElevationGain" m" |" >> "$dirTemp/glow.md"
+	echo "| Start Time | $(echo $activityStartTime | tr 'T' ' ' | tr 'Z' ' ' | awk '{$1=$1};1') |" >> "$dirTemp/glow.md"
+	echo "| City | $activityCity |" >> "$dirTemp/glow.md"
+	echo "| State | $activityState |" >> "$dirTemp/glow.md"
+	echo "| Country | $activityCountry |" >> "$dirTemp/glow.md"
+	echo "| Achievements | $activityAchievements" Achievements" |" >> "$dirTemp/glow.md"
+	echo "| Kudos | $activityKudos" Kudos" |" >> "$dirTemp/glow.md"
+	echo "| Athletes | $activitiesAthleteCount" Athletes" |" >> "$dirTemp/glow.md"
+	echo "| Average Speed | $(awk -v var="$activityAverageSpeed" 'BEGIN{sum=var*3.6; printf "%.2f km/h\n", sum}') |" >> "$dirTemp/glow.md"
+	echo "| Max Speed | $(awk -v var="$activityMaxSpeed" 'BEGIN{sum=var*3.6; printf "%.2f km/h\n", sum}') |" >> "$dirTemp/glow.md"
+	echo "| Highest Elevation | $activityElevHigh" m" |" >> "$dirTemp/glow.md"
+	echo "| Lowest Elevation | $activityElevLow" m" |" >> "$dirTemp/glow.md"
+	echo "| PRs | $activityPRCount" PRs" |" >> "$dirTemp/glow.md"
+	echo "| Lap One Time | $(date -d@$lapOneTime -u +"%H:"%M:"%S") |" >> "$dirTemp/glow.md"
 }
 
 
 makeGlowSegment () {
-	echo "# Testing Segments" > glow.md
+	echo "# Testing Segments" > "$dirTemp/glow.md"
 
-	echo "| Key | Value |" >> glow.md
-	echo "| :--: | :--: |" >> glow.md
+	echo "| Key | Value |" >> "$dirTemp/glow.md"
+	echo "| :--: | :--: |" >> "$dirTemp/glow.md"
 
-	echo "| Name | $segmentName |" >> glow.md
-	echo "| Distance | $(awk -v var="$segmentDistance" 'BEGIN{sum=var/1000; printf "%.2f km\n", sum}') |" >> glow.md
-	echo "| Average Grade | $segmentAverageGrade"%" |" >> glow.md
-	echo "| Maximum Grade | $segmentMaximumGrade"%" |" >> glow.md
-	echo "| Highest Elevation | $segmentEvelHigh" m" |" >> glow.md
-	echo "| Lowest Elevation | $segmentEvelLow" m" |" >> glow.md
-	echo "| Climb Category | "Category "$segmentClimbCategory |" >> glow.md
-	echo "| State | $segmentState |" >> glow.md
-	echo "| Country | $segmentCountry |" >> glow.md
-	echo "| Elevation Gain | $segmentElevGain" m" |" >> glow.md
-	echo "| Atheletes | $segmentAthleteCount" Athletes" |" >> glow.md
-	echo "| My PR Time | $(date -d@$segmentMyBestTime -u +"%H:"%M:"%S") |" >> glow.md
-	echo "| My PR Date | $(echo $segmentMyBestDate | tr 'T' ' ' | tr 'Z' ' ' | awk '{$1=$1};1') |" >> glow.md
-	echo "| My PR ID | "ID: "$segmentMyBestID |" >> glow.md
-	echo "| My PR Efforts | $segmentMyEfforts" Efforts" |" >> glow.md
-	echo "| KOM | $(date -d@$(awk -v mins="$(echo $segmentKOM | cut -d ":" -f 1)" -v secs="$(echo $segmentKOM | cut -d ":" -f 2)" 'BEGIN{sum=mins*60+secs; printf "%d\n", sum}') -u +"%H:"%M:"%S") |" >> glow.md
-	echo "| QOM | $(date -d@$(awk -v mins="$(echo $segmentQOM | cut -d ":" -f 1)" -v secs="$(echo $segmentQOM | cut -d ":" -f 2)" 'BEGIN{sum=mins*60+secs; printf "%d\n", sum}') -u +"%H:"%M:"%S") |" >> glow.md
+	echo "| Name | $segmentName |" >> "$dirTemp/glow.md"
+	echo "| Distance | $(awk -v var="$segmentDistance" 'BEGIN{sum=var/1000; printf "%.2f km\n", sum}') |" >> "$dirTemp/glow.md"
+	echo "| Average Grade | $segmentAverageGrade"%" |" >> "$dirTemp/glow.md"
+	echo "| Maximum Grade | $segmentMaximumGrade"%" |" >> "$dirTemp/glow.md"
+	echo "| Highest Elevation | $segmentEvelHigh" m" |" >> "$dirTemp/glow.md"
+	echo "| Lowest Elevation | $segmentEvelLow" m" |" >> "$dirTemp/glow.md"
+	echo "| Climb Category | "Category "$segmentClimbCategory |" >> "$dirTemp/glow.md"
+	echo "| State | $segmentState |" >> "$dirTemp/glow.md"
+	echo "| Country | $segmentCountry |" >> "$dirTemp/glow.md"
+	echo "| Elevation Gain | $segmentElevGain" m" |" >> "$dirTemp/glow.md"
+	echo "| Atheletes | $segmentAthleteCount" Athletes" |" >> "$dirTemp/glow.md"
+	echo "| My PR Time | $(date -d@$segmentMyBestTime -u +"%H:"%M:"%S") |" >> "$dirTemp/glow.md"
+	echo "| My PR Date | $(echo $segmentMyBestDate | tr 'T' ' ' | tr 'Z' ' ' | awk '{$1=$1};1') |" >> "$dirTemp/glow.md"
+	echo "| My PR ID | "ID: "$segmentMyBestID |" >> "$dirTemp/glow.md"
+	echo "| My PR Efforts | $segmentMyEfforts" Efforts" |" >> "$dirTemp/glow.md"
+	echo "| KOM | $(date -d@$(awk -v mins="$(echo $segmentKOM | cut -d ":" -f 1)" -v secs="$(echo $segmentKOM | cut -d ":" -f 2)" 'BEGIN{sum=mins*60+secs; printf "%d\n", sum}') -u +"%H:"%M:"%S") |" >> "$dirTemp/glow.md"
+	echo "| QOM | $(date -d@$(awk -v mins="$(echo $segmentQOM | cut -d ":" -f 1)" -v secs="$(echo $segmentQOM | cut -d ":" -f 2)" 'BEGIN{sum=mins*60+secs; printf "%d\n", sum}') -u +"%H:"%M:"%S") |" >> "$dirTemp/glow.md"
 }
 
 # Add new activity 
@@ -154,7 +155,7 @@ if [[ "$1" == "-a" ]]; then
 	sleep 3
 	finishedUpload=$(curl "https://www.strava.com/api/v3/uploads/$uploadID" -h "Authorization: Bearer $accessA")
 	rideID=$(echo "$finishedUpload" | jq .activity_id)
-	"$HOME/Programs/smallPrograms/strava.sh" -r "$rideID"
+	"$dirName/strava.sh" -r "$rideID"
 # View information for segment
 elif [[ "$1" == "-s" ]]; then
 	init
@@ -165,9 +166,9 @@ elif [[ "$1" == "-s" ]]; then
 	read -r segmentName segmentDistance segmentAverageGrade segmentMaximumGrade segmentEvelHigh segmentEvelLow segmentClimbCategory segmentState segmentCountry segmentElevGain segmentAthleteCount segmentMyBestTime segmentMyBestDate segmentMyBestID segmentMyEfforts segmentKOM segmentQOM <<<$(echo $returnedJSON | jq -r '[.name,.distance,.average_grade,.maximum_grade,.elevation_high,.elevation_low,.climb_category,.state,.country,.total_elevation_gain,.athlete_count,.athlete_segment_stats.pr_elapsed_time,.athlete_segment_stats.pr_date,.athlete_segment_stats.pr_activity_id,.athlete_segment_stats.effort_count,.xoms.kom,.xoms.qom] | join ("|")')
 	IFS=$oldIFS
 	makeGlowSegment
-	python3 segmentLeaderboard.py "$2"
-
-	paste <(unbuffer glow -w 50 glow.md) <(unbuffer glow -w 62 table.md) | column -s $'\t' -tne$
+	python3 "$dirName/segmentLeaderboard.py" "$2"
+	echo ""
+	paste <(unbuffer glow -w 50 "$dirTemp/glow.md") <(unbuffer glow -w 62 "$dirTemp/table.md") | column -s $'\t' -tne$
 # View information for ride
 elif [[ "$1" == "-r" ]]; then
 	init read
@@ -178,8 +179,7 @@ elif [[ "$1" == "-r" ]]; then
 	read -r activityName activityDistance activityMovingTime activityElapsedTime activityElevationGain activityStartTime activityCity activityState activityCountry activityAchievements activityKudos activitiesAthleteCount activityAverageSpeed activityMaxSpeed activityElevHigh activityElevLow activityPRCount lapOneTime <<<$(echo $returnedJSON | jq -r '[.name,.distance,.moving_time,.elapsed_time,.total_elevation_gain,.start_date_local,.location_city,.location_state,.location_country,.achievement_count,.kudos_count,.athlete_count,.average_speed,.max_speed,.elev_high,.elev_low,.pr_count,.laps[0].elapsed_time] | join("|")')
 	IFS=$oldIFS
 	makeGlowActivity
-
-	glow glow.md
+	glow "$dirTemp/glow.md"
 	
 # Print help info
 else
