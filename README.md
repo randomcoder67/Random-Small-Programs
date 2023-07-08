@@ -63,3 +63,21 @@ Location Name|Location ID
 The program uses a Curses interface. Use `Left` and `Right` to go between days, and `Up` and `Down` to go forwards backwards in a day when applicable.  
 `l` to show Legend/Key  
 `q` to quit
+
+## Music Tag 
+
+Python script to tag a music file downloaded from YouTube music. 
+
+### Setup 
+
+Install `python music_tag`
+
+### Usage 
+
+Download the song from YouTube Music using this command:  
+`yt-dlp -f 140 -o "%(title)s - %(channel)s - %(album)s.%(ext)s"`  
+Or `yt-music` if using the `bashrc` from my dotfiles. 
+
+Go to Apple Music and get the album ID (in the url when on the Apple Music album page)
+
+`python3 tagMusicFile.py filename appleMusicAlbumID` 
