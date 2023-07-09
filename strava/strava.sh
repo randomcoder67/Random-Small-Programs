@@ -68,7 +68,7 @@ init () {
 }
 
 makeGlowActivity () {
-	echo "# Testing Activies" > "$dirTemp/glow.md"
+	echo "# Activity Information" > "$dirTemp/glow.md"
 
 	echo "| Key | Value |" >> "$dirTemp/glow.md"
 	echo "| :--: | :--: |" >> "$dirTemp/glow.md"
@@ -95,7 +95,7 @@ makeGlowActivity () {
 
 
 makeGlowSegment () {
-	echo "# Testing Segments" > "$dirTemp/glow.md"
+	echo "# Segment Information" > "$dirTemp/glow.md"
 
 	echo "| Key | Value |" >> "$dirTemp/glow.md"
 	echo "| :--: | :--: |" >> "$dirTemp/glow.md"
@@ -115,8 +115,40 @@ makeGlowSegment () {
 	echo "| My PR Date | $(echo $segmentMyBestDate | tr 'T' ' ' | tr 'Z' ' ' | awk '{$1=$1};1') |" >> "$dirTemp/glow.md"
 	echo "| My PR ID | "ID: "$segmentMyBestID |" >> "$dirTemp/glow.md"
 	echo "| My PR Efforts | $segmentMyEfforts" Efforts" |" >> "$dirTemp/glow.md"
-	echo "| KOM | $(date -d@$(awk -v mins="$(echo $segmentKOM | cut -d ":" -f 1)" -v secs="$(echo $segmentKOM | cut -d ":" -f 2)" 'BEGIN{sum=mins*60+secs; printf "%d\n", sum}') -u +"%H:"%M:"%S") |" >> "$dirTemp/glow.md"
-	echo "| QOM | $(date -d@$(awk -v mins="$(echo $segmentQOM | cut -d ":" -f 1)" -v secs="$(echo $segmentQOM | cut -d ":" -f 2)" 'BEGIN{sum=mins*60+secs; printf "%d\n", sum}') -u +"%H:"%M:"%S") |" >> "$dirTemp/glow.md"
+	if [[ "$segmentKOM" == *"s"* ]]; then
+		toPrintKOM="00:00:${segmentKOM//s}"
+	else
+		toPrintKOM=$(date -d@$(awk -v mins="$(echo $segmentKOM | cut -d ":" -f 1)" -v secs="$(echo $segmentKOM | cut -d ":" -f 2)" 'BEGIN{sum=mins*60+secs; printf "%d\n", sum}') -u +"%H:"%M:"%S")
+	fi
+	echo "| KOM | $toPrintKOM |" >> "$dirTemp/glow.md"
+	if [[ "$segmentQOM" == *"s"* ]]; then
+		toPrintQOM="00:00:${segmentQOM//s}"
+	else
+		toPrintQOM=$(date -d@$(awk -v mins="$(echo $segmentQOM | cut -d ":" -f 1)" -v secs="$(echo $segmentKOM | cut -d ":" -f 2)" 'BEGIN{sum=mins*60+secs; printf "%d\n", sum}') -u +"%H:"%M:"%S")
+	fi
+	echo "| QOM | $toPrintQOM |" >> "$dirTemp/glow.md"
+}
+
+makeGlowSegmentsList () {
+	echo "# Choose a Segment" > "$dirTemp/glowSegments.md"
+
+	echo "| Segment | Achievements | Index |" >> "$dirTemp/glowSegments.md"
+	echo "| :--: | :--: | :--: |" >> "$dirTemp/glowSegments.md"
+	
+	rm "$dirTemp/recentSegments.txt"
+	
+	for i in $(seq 1 $(echo "$segmentEfforts" | jq length)); do
+		realIndex=$((i-1))
+		curSegment=$(echo "$segmentEfforts" | jq .["$realIndex"])
+		segmentName=$(echo "$curSegment" | jq -r .name)
+		segmentID=$(echo "$curSegment" | jq -r .segment.id)
+		echo "$segmentID" >> "$dirTemp/recentSegments.txt"
+		prYesOrNo="No"
+		if (( $(echo $curSegment | jq .achievements | jq length) > 0 )); then
+			prYesOrNo="Yes"
+		fi
+		echo "| $segmentName | $prYesOrNo | $i |" >> "$dirTemp/glowSegments.md"
+	done
 }
 
 # Add new activity 
@@ -153,22 +185,28 @@ if [[ "$1" == "-a" ]]; then
 	returnedJSON=$(curl -X POST "https://www.strava.com/api/v3/uploads" -F file="@""$2" -F name="$nameA" -F description="$descriptionA" -F trainer="$trainerA" -F commute="$commuteA" -F data_type="$dataTypeA" -H "Authorization: Bearer $accessA")
 	uploadID=$(echo "$returnedJSON" | jq .id)
 	sleep 3
-	finishedUpload=$(curl "https://www.strava.com/api/v3/uploads/$uploadID" -h "Authorization: Bearer $accessA")
+	finishedUpload=$(curl "https://www.strava.com/api/v3/uploads/$uploadID" -H "Authorization: Bearer $accessA")
 	rideID=$(echo "$finishedUpload" | jq .activity_id)
 	"$dirName/strava.sh" -r "$rideID"
 # View information for segment
 elif [[ "$1" == "-s" ]]; then
 	init
-	returnedJSON=$(curl -s -G "https://www.strava.com/api/v3/segments/{$2}" -H "Authorization: Bearer $accessA")
+	if (( ${#2} > 3 )); then
+		toGet="$2"
+	else
+		recentID=$(cat "$dirTemp/recentSegments.txt" | sed -n "${2}p")
+		toGet="$recentID"
+	fi
+	returnedJSON=$(curl -s -G "https://www.strava.com/api/v3/segments/{$toGet}" -H "Authorization: Bearer $accessA")
 
 	oldIFS=$IFS
 	IFS='|'
 	read -r segmentName segmentDistance segmentAverageGrade segmentMaximumGrade segmentEvelHigh segmentEvelLow segmentClimbCategory segmentState segmentCountry segmentElevGain segmentAthleteCount segmentMyBestTime segmentMyBestDate segmentMyBestID segmentMyEfforts segmentKOM segmentQOM <<<$(echo $returnedJSON | jq -r '[.name,.distance,.average_grade,.maximum_grade,.elevation_high,.elevation_low,.climb_category,.state,.country,.total_elevation_gain,.athlete_count,.athlete_segment_stats.pr_elapsed_time,.athlete_segment_stats.pr_date,.athlete_segment_stats.pr_activity_id,.athlete_segment_stats.effort_count,.xoms.kom,.xoms.qom] | join ("|")')
 	IFS=$oldIFS
 	makeGlowSegment
-	python3 "$dirName/segmentLeaderboard.py" "$2"
+	python3 "$dirName/segmentLeaderboard.py" "$toGet"
 	echo ""
-	paste <(unbuffer glow -w 50 "$dirTemp/glow.md") <(unbuffer glow -w 62 "$dirTemp/table.md") | column -s $'\t' -tne$
+	paste <(unbuffer glow -w 60 "$dirTemp/glow.md") <(unbuffer glow -w 66 "$dirTemp/table.md") | column -s $'\t' -tne$
 # View information for ride
 elif [[ "$1" == "-r" ]]; then
 	init read
@@ -177,14 +215,16 @@ elif [[ "$1" == "-r" ]]; then
 	oldIFS=$IFS
 	IFS='|'
 	read -r activityName activityDistance activityMovingTime activityElapsedTime activityElevationGain activityStartTime activityCity activityState activityCountry activityAchievements activityKudos activitiesAthleteCount activityAverageSpeed activityMaxSpeed activityElevHigh activityElevLow activityPRCount lapOneTime <<<$(echo $returnedJSON | jq -r '[.name,.distance,.moving_time,.elapsed_time,.total_elevation_gain,.start_date_local,.location_city,.location_state,.location_country,.achievement_count,.kudos_count,.athlete_count,.average_speed,.max_speed,.elev_high,.elev_low,.pr_count,.laps[0].elapsed_time] | join("|")')
+	segmentEfforts=$(echo "$returnedJSON" | jq .segment_efforts)
 	IFS=$oldIFS
 	makeGlowActivity
-	glow "$dirTemp/glow.md"
+	makeGlowSegmentsList
+	paste <(unbuffer glow -w 56 "$dirTemp/glow.md") <(unbuffer glow -w 68 "$dirTemp/glowSegments.md") | column -s $'\t' -tne$
 	
 # Print help info
 else
 	echo "Usage:"
 	echo "  -a FILENAME = Add Ride"
-	echo "  -s SEGMENT_ID = Get Segment Leaderboard and Stats"
+	echo "  -s SEGMENT_ID/Index = Get Segment Leaderboard and Stats"
 	echo "  -r ACTIVITY_ID = Get Activity Stats"
 fi
