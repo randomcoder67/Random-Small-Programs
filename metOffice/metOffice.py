@@ -7,12 +7,21 @@ from metOfficeDict import weatherSymbols, windDirection, rowLabels, weatherColor
 import curses
 from curses import wrapper
 import os
+import signal
+import sys
+
+# Ctrl + C to quit working properly 
+def signal_handler(sig, frame):
+	print('q')
+	sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
 
 # Display avalible locations and allow user to pick (unless there is only one)
-
-fileLocation = os.path.realpath(__file__)
+fileLocation = os.path.realpath(__file__) # Get location of this file 
 locationsFileName = fileLocation.rpartition("/")[0] + "/locations.csv"
 
+# Open file and read all entries, if only 1, use automatically, else allow use to pick
 f = open(locationsFileName, "r")
 lines = f.readlines()
 location = ""
@@ -30,35 +39,33 @@ else:
 
 location = location.rstrip()
 
+# Get webpage 
 r = requests.get('https://www.metoffice.gov.uk/weather/forecast/' + location)
-
 soup = BeautifulSoup(r.text, 'html.parser')
 
+# Get days (to print which day it is at the top of the page)
 days = soup.find_all("span", {"class": "timeline-date"})
-
 dateStrings = []
-
 for day in days:
 	dateStrings.append(day.parent.text)
 
+# Replace images with alt text for images 
 things = soup.find_all('img')
-
 for x in things:
 	#print(x["alt"])
 	newpara = "<td>" + x["alt"] + "</td>"
 	x.replaceWith(x["alt"])
 
+# Collect all days into a list of lists
 allDays = []
-
 tables = soup.find_all("table")
 
 for i, table in enumerate(tables):
-	if i == 7:
+	if i == 7: # If i is 7, at end of days 
 		break
 	
-	
-	day = []
-	table_head = table.find("thead")
+	day = [] # Make array for current day
+	table_head = table.find("thead") # Parse table 
 	rows = table_head.find_all("tr")
 	
 	for index, row in enumerate(rows):
@@ -66,10 +73,8 @@ for i, table in enumerate(tables):
 		cols = [ele.text.strip() for ele in cols]
 		day.append([ele for ele in cols if ele])
 	
-	#print(day)
-	day[0].pop(0)
-	#print(day)
-		
+	day[0].pop(0) # First timestamp is duplicated, drop it
+	
 	table_body = table.find("tbody")
 	rows = table_body.find_all("tr")
 
@@ -79,7 +84,8 @@ for i, table in enumerate(tables):
 		day.append([ele for ele in cols if ele])
 		if index == 5:
 			day.append([ele for ele in cols if ele])
-		
+	
+	# Correctly format wind stuff 
 	for index, condition in enumerate(day[5]):
 		day[5][index] = windDirection[condition.split("\n")[0]]
 		day[6][index] = condition.split('\n\n')[1] + " mph"
@@ -88,9 +94,7 @@ for i, table in enumerate(tables):
 		day[7][index] = condition + " mph"
 	allDays.append(day)
 
-
-#print(allDays)
-
+# Main function for curses
 def main(cursesScreen):
 	legend = False
 	currentDay = 0
@@ -130,6 +134,7 @@ def main(cursesScreen):
 			curses.curs_set(0)
 			#curses.start_color()
 			
+			# Define colours 
 			curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
 			curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
 			curses.init_pair(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)
@@ -148,6 +153,7 @@ def main(cursesScreen):
 			WHITE = curses.color_pair(7)
 			#DARK_BLUE = curses.color_pair(8)
 			
+			# Add current day to top of screen
 			cursesScreen.addstr(0, 1, dateStrings[currentDay] + ":\t ", MAGENTA)
 			
 			lengthA = len(allDays[currentDay][0])
@@ -321,29 +327,28 @@ def main(cursesScreen):
 					uvColor = RED
 				elif item == "11":
 					uvColor = MAGENTA
-				#print(uvColor)
 				cursesScreen.addstr(index*2, 30+itemIndex*8, item, uvColor)
 			index += 1
 		
 		ch = cursesScreen.getch()
 		
-		if ch == ord("q"):
+		if ch == ord("q"): # Quit program
 			break
-		elif ch == curses.KEY_RIGHT:
+		elif ch == curses.KEY_RIGHT: # Go to next day (if possible)
 			if not currentDay == 6:
 				currentDay += 1
 				currentPosition = 9	
-		elif ch == curses.KEY_LEFT:
+		elif ch == curses.KEY_LEFT: # Go to previous day (if possible)
 			if not currentDay == 0:
 				currentDay -= 1
 				currentPosition = 9
-		elif ch == curses.KEY_UP:
+		elif ch == curses.KEY_UP: # Go back in day (if possible)
 			if not currentPosition == 9:
 				currentPosition -= 9
-		elif ch == curses.KEY_DOWN:
+		elif ch == curses.KEY_DOWN: # Go forward in day (if possible)
 			if currentPosition < lengthA:
 				currentPosition += 9
-		elif ch == ord("l"):
+		elif ch == ord("l"): # Display legend 
 			if legend:
 				legend = False
 			else:

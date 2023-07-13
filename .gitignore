@@ -4,3 +4,5 @@ metOffice/output.html
 proCyclingStats/output.html
 metOffice/locations.csv
 musicTag/music_tag
+chestOrganiser/images/
+chestOrganiser/__pycache__/
