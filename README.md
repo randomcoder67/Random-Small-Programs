@@ -4,11 +4,12 @@ A repository for random small scripts and programs I write.
 
 ## Strava
 
-Script to get info from Strava API. Currently supports viewing one of your activities by ID, and a segment by ID.  
+Script to interact with Strava API, can display activity and segment information, and upload a ride.  
+Allows viewing Strava rides and segments and uploading rides without using a web browser.  
 Uses a bash script for the main functionality and calls a Python script to get the segment leaderboard because it's not included in the Strava API free functionality.  
 **ToDo:** 
-* Add ability to upload a ride
-* Easier way to select activities and segments than using the ID
+* Add ability to upload a ride - **DONE**
+* Easier way to select activities and segments than using the ID - **DONE**
 
 ### Setup
 
@@ -18,8 +19,10 @@ Run `./strava.sh` and follow instructions
 
 ### Usage 
 
-Activity Information: `./strava.sh -r *activity_id*`  
-Segment Information: `./strava.sh -s *segment_id*`
+Activity Information: `./strava.sh -r activity_id`  
+Segment Information: `./strava.sh -s segment_id/index`
+
+When you view an activity, it displays all the segments with an index. You can then run `./strava.sh -s index` to view the information for that segment. This saves typing the segment ID. The indexes are the same until a new activity is viewer. 
 
 ## Pro Cycling Stats
 
@@ -27,6 +30,7 @@ Python script to get current race information, at the moment only displays time 
 **ToDo:**
 * Display more information
 * Work with TTs
+* Fix (might be broken)
 
 ### Setup
 
@@ -39,10 +43,11 @@ Dependancies: `python requests` and `python BeautifulSoup4`
 ## Met Office 
 
 Python script to get weather forecast from the MetOffice. (Uses web scraping, there is a MetOffice API but it has less detail than the webpage and also doesn't use HTTPS)
+Gives `curl wttr.in` like functionality but with more detail and more accuracy (at least in the UK) 
 
 **ToDo**: 
-* Add way to choose location 
-* Add which day is currently selected 
+* Add way to choose location - **DONE** 
+* Add which day is currently selected - **DONE** 
 
 ### Setup 
 
