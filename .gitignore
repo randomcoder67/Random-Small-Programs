@@ -9,3 +9,6 @@ chestOrganiser/save.json
 chestOrganiser/files.csv
 chestOrganiser/__pycache__/
 strava/strava.txt.gpg
+strava/strava.txt
+mdToGroff/go.sum
+mdToGroff/groff

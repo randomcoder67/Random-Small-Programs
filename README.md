@@ -103,3 +103,18 @@ A list of all Minecraft items and a picture for each is needed. These can be obt
 
 `python3 gtkPython.py`  
 Select which category you want to add to at the top, then click on an item to add it. To remove, click on an item in a category page when that category is selected. 
+
+## md To Groff 
+
+Program to convert a markdown file into a pdf without the use of pandoc or latex. WIP 
+
+Still figuring out how best to handle images. Using `.pdf` images looks the best, but it requires the `-U` unsafe option for groff, unlike `.ps` or `.eps` images. 
+
+### Setup 
+
+`go mod tidy`  
+`go get github.com/gomarkdown/markdown`
+
+### Usage 
+
+`go run groff.go input.md output.pdf`
