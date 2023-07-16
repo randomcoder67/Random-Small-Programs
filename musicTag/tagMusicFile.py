@@ -75,6 +75,7 @@ albumA = ""
 artistA = ""
 titleA = ""
 
+# If there are more than 2 - character in the filename, need to ask user where the extra one is
 if fileFormatted.count(" - ") > 2:
 	print("Which field contains the extra - character? (1 = Title, 2 = Artist, 3 = Album)")
 	fieldA = input("Enter number: ")

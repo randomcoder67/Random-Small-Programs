@@ -191,9 +191,10 @@ if [[ "$1" == "-a" ]]; then
 # View information for segment
 elif [[ "$1" == "-s" ]]; then
 	init
+	# If the argument is more than 3 characters long, it's a segment ID, not an index 
 	if (( ${#2} > 3 )); then
 		toGet="$2"
-	else
+	else # If it's an index, get the segment ID from the index 
 		recentID=$(cat "$dirTemp/recentSegments.txt" | sed -n "${2}p")
 		toGet="$recentID"
 	fi
