@@ -1,12 +1,14 @@
 # Random Small Programs
 
-A repository for random small scripts and programs I write. 
+A repository for random small scripts and programs I write.  
+Some finished and usable, some WIP. 
 
 ## Strava
 
 Script to interact with Strava API, can display activity and segment information, and upload a ride.  
 Allows viewing Strava rides and segments and uploading rides without using a web browser.  
-Uses a bash script for the main functionality and calls a Python script to get the segment leaderboard because it's not included in the Strava API free functionality.  
+Uses a bash script for the main functionality and calls a Python script to get the segment leaderboard because it's not included in the Strava API free functionality.
+
 **ToDo:** 
 * Add ability to upload a ride - **DONE**
 * Easier way to select activities and segments than using the ID - **DONE**
@@ -27,6 +29,7 @@ When you view an activity, it displays all the segments with an index. You can t
 ## Pro Cycling Stats
 
 Python script to get current race information, at the moment only displays time gaps. 
+
 **ToDo:**
 * Display more information
 * Work with TTs
@@ -75,7 +78,8 @@ Python script to tag a music file downloaded from YouTube music.
 
 ### Setup 
 
-Install `python music_tag`
+Install `python music_tag` using pip or manually or Arch  
+`pacman -S python-mutagen python-pillow`  
 
 ### Usage 
 
@@ -86,28 +90,6 @@ Or `yt-music` if using the `bashrc` from my dotfiles.
 Go to Apple Music and get the album ID (in the url when on the Apple Music album page)
 
 `python3 tagMusicFile.py filename appleMusicAlbumID`
-
-## Chest Organiser 
-
-Python program to help organise items in a Minecraft storage system. WIP. 
-
-### Setup 
-
-A list of all Minecraft items and a picture for each is needed. These can be obtained in the following way:
-
-`unzip` the minecraft.jar file, copy the textures  
-`curl "https://minecraft.fandom.com/wiki/Block" > blocks.html`  
-`python3 parseHTML.py > toDownload.csv`  
-`mkdir files`  
-`python3 download.py toDownload.csv`  
-`cp *unzippedJar*/assets/minecraft/textures/item images`  
-`mv files/* images/`  
-`python3 matchFilesnames.py stuff/items.txt`  
-
-### Usage 
-
-`python3 gtkPython.py`  
-Select which category you want to add to at the top, then click on an item to add it. To remove, click on an item in a category page when that category is selected. 
 
 ## md To Groff 
 
