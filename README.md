@@ -3,6 +3,21 @@
 A repository for random small scripts and programs I write.  
 Some finished and usable, some WIP. 
 
+## REPO ARCHIVED
+
+**I've moved these programs to other repos**
+
+The current Strava script is now part of my dotfiles: [XFCE-Laptop-Config](https://github.com/randomcoder67/XFCE-Laptop-Config)  
+In the future I plan to make a better Strava terminal program using Go, which will be here: [Go Terminal Strava](https://github.com/randomcoder67/Go-Terminal-Strava)
+
+The Met Office program is now here (and will be improved): [Go Terminal Weather](https://github.com/randomcoder67/Go-Terminal-Weather)
+
+Music Tag program is in my dotfiles: [XFCE-Laptop-Config](https://github.com/randomcoder67/XFCE-Laptop-Config)
+
+md To Groff is also in my dotfiles: [XFCE-Laptop-Config](https://github.com/randomcoder67/XFCE-Laptop-Config)
+
+The Pro Cycling Stats program broke, in the future I might remake it and add it to my dotfiles
+
 ## Strava
 
 Script to interact with Strava API, can display activity and segment information, and upload a ride.  
